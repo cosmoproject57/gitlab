@@ -28,3 +28,47 @@ push_jars:
     - curl --user $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file file1.jar $NEXUS_REPO_URL/repository/path/to/jar/file1.jar
     - curl --user $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file file2.jar $NEXUS_REPO_URL/repository/path/to/jar/file2.jar
     # Add more curl commands for each JAR file you want to push
+
+
+-----
+# correct
+
+stages:
+  - pull
+  - push
+
+variables:
+  JBOSS_SERVER_URL: $JBOSS_URL
+  NEXUS_REPO_URL: $NEXUS_URL
+  JBOSS_USERNAME: $JBOSS_USERNAME
+  JBOSS_PASSWORD: JBOSS_PASSWORD
+  NEXUS_USERNAME: $NEXUS_USERNAME
+  NEXUS_PASSWORD: $NEXUS_PASSWORD
+
+pull_jars:
+  stage: pull
+  image: ubuntu:latest # Specify the Ubuntu image
+  script:
+    - apt-get update
+    - apt-get install -y curl
+    - echo "Pulling JAR files from JBoss server..."
+    - curl --user $JBOSS_USERNAME:$JBOSS_PASSWORD -O $JBOSS_SERVER_URL/path/to/jar/file1.jar
+    - curl --user $JBOSS_USERNAME:$JBOSS_PASSWORD -O $JBOSS_SERVER_URL/path/to/jar/file2.jar
+    # Add more curl commands for each JAR file you want to pull
+  artifacts:
+    paths:
+      - "*.jar"
+
+push_jars:
+  stage: push
+  image: ubuntu:latest # Specify the Ubuntu image
+  script:
+    - apt-get update
+    - apt-get install -y curl
+    - echo "Pushing JAR files to Nexus repository..."
+    - curl --user $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file file1.jar $NEXUS_REPO_URL/repository/path/to/jar/file1.jar
+    - curl --user $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file file2.jar $NEXUS_REPO_URL/repository/path/to/jar/file2.jar
+    # Add more curl commands for each JAR file you want to push
+
+
+
