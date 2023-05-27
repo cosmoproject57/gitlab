@@ -1,0 +1,23 @@
+stages:
+  - push
+  - finish_push
+
+push:
+  stage: push
+  image: ubuntu:latest
+  script:
+    # Update package lists and install curl
+    - sudo apt-get update && sudo apt-get install -y curl
+
+    # Upload *.jar files to the specified Nexus repository
+    - curl -v -u $USERNAME:$PASSWORD --upload-file *.jar http://$SERVER_IP/repository/maven-snapshots/net/sf/json-lib/json-lib.2.4/2.4/my-app-1.0.0-20230527.123466-1.jar
+
+    # Upload *.war files to the specified Nexus repository
+    - curl -v -u $USERNAME:$PASSWORD --upload-file *.war http://$SERVER_IP/repository/maven-snapshots/net/sf/json-lib/json-lib.2.4/2.4/my-app-1.0.0-20230527.123466-1.war
+
+finish_push:
+  stage: finish_push
+  image: ubuntu:latest
+  script:
+    # Print "FINISHED" message
+    - echo "FINISHED"
