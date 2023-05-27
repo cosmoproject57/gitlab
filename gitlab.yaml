@@ -1,0 +1,16 @@
+stages:
+  - deploy
+
+variables:
+  NEXUS_USERNAME: your_nexus_username
+  NEXUS_PASSWORD: your_nexus_password
+  JBOSS_SERVER: your_jboss_server
+  JBOSS_USERNAME: your_jboss_username
+  JBOSS_PASSWORD: your_jboss_password
+  JBOSS_DEPLOYMENT_DIR: /path/to/your/jboss/standalone/deployment
+
+deploy:
+  stage: deploy
+  script:
+    - apt-get update && apt-get install -y curl openssh-client
+    - sshpass -p $JBOSS_PASSWORD ssh -o StrictHostKeyChecking=no $JBOSS_USERNAME@$JBOSS_SERVER "cd $JBOSS_DEPLOYMENT_DIR && scp -o StrictHostKeyChecking=no *.jar $NEXUS_USERNAME:$NEXUS_PASSWORD@your-nexus-repository-url/repository/your-repository-name/your-artifact-path/"
