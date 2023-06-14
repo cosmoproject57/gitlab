@@ -129,3 +129,42 @@ deploy:
 
 # With this configuration, when you trigger the GitLab pipeline, it will run the Ansible playbook, including the tasks to check the JBoss server status, 
 # stop the server, perform the backup, configuration file copy, Nexus artifact retrieval, and deployment of the new WAR file to the JBoss server.
+
+
+
+
+- name: Deploy JAR/WAR to JBoss Server
+  hosts: jboss_servers
+  tasks:
+    - name: Stop JBoss Server
+      shell: /path/to/jboss/stop_script.sh
+
+    - name: Backup WAR File
+      shell: >
+        mv /path/to/jboss/deployments/app.war
+        /path/to/jboss/deployments/backup/app_$(date +"%Y%m%d_%H%M%S").war
+
+    - name: Copy Configuration Files to UAT and PROD
+      copy:
+        src: /path/to/configuration/*.properties
+        dest: /path/to/jboss/configuration/
+        remote_src: yes
+
+    - name: Pull Artifacts Libraries from Nexus
+      command: mvn dependency:copy -Dartifact=group:artifact:version -DoutputDirectory=/path/to/libs/
+
+    - name: Copy New WAR File from Nexus
+      command: mvn dependency:copy -Dartifact=group:artifact:version -DoutputDirectory=/path/to/jboss/deployments/
+
+    - name: Deploy New WAR File to JBoss Server
+      shell: /path/to/jboss/deploy_script.sh
+
+    - name: Check JBoss Server Status
+      shell: >
+        systemctl is-active jboss
+      register: jboss_status
+      changed_when: false
+
+    - name: Start JBoss Server
+      shell: systemctl start jboss
+      when: jboss_status.stdout != "active"
