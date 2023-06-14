@@ -45,18 +45,24 @@ deploy:
 
 
 
-# In this updated version, the playbook adds tasks to backup the existing WAR file, copy configuration files to UAT and PROD, pull artifacts libraries from Nexus, and deploy the new WAR file to the JBoss server.
+# In this updated version, the playbook adds tasks to backup the existing WAR file, 
+# copy configuration files to UAT and PROD, pull artifacts libraries from Nexus, and deploy the new WAR file to the JBoss server.
 
 # Please make sure to customize the paths, names, Nexus URL, and other parameters in the playbook according to your specific setup.
 
-# The backup task uses the shell module to rename the existing WAR file with the current date appended to its name. Adjust the source and destination paths accordingly.
+# The backup task uses the shell module to rename the existing WAR file with the current date appended to its name. 
+# Adjust the source and destination paths accordingly.
 
-# The task to copy the new WAR file from Nexus uses the shell module to download the file from the Nexus repository and save it to the appropriate location on the JBoss server. Update the Nexus URL and destination path to match your environment.
+# The task to copy the new WAR file from Nexus uses the shell module to download the file from the Nexus repository and 
+# save it to the appropriate location on the JBoss server. Update the Nexus URL and destination path to match your environment.
 
-# The task to copy the configuration files uses the copy module to transfer the required properties files to the JBoss server. Adjust the source and destination paths to match your configuration.
+# The task to copy the configuration files uses the copy module to transfer the required properties files to the JBoss server. 
+# Adjust the source and destination paths to match your configuration.
 
-# Lastly, the playbook includes the task to restart the JBoss server using the systemd module. Update the name parameter to match your JBoss service unit name.
+# Lastly, the playbook includes the task to restart the JBoss server using the systemd module. 
+# Update the name parameter to match your JBoss service unit name.
 
-# With this configuration, when you trigger the GitLab pipeline, it will run the Ansible playbook, including the additional tasks for backup, configuration file copy, Nexus artifact retrieval, and deployment of the new WAR file to the JBoss server.
+# With this configuration, when you trigger the GitLab pipeline, it will run the Ansible playbook, including the additional tasks for backup, 
+# configuration file copy, Nexus artifact retrieval, and deployment of the new WAR file to the JBoss server.
 
  
