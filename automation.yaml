@@ -1,0 +1,62 @@
+.gitlab-ci.yml:
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  image: ansible/ansible-runner:latest
+  script:
+    - ansible-playbook -i inventory playbook.yml
+   
+   
+# playbook.yml: 
+    
+- name: Deploy JAR/WAR to JBoss server
+  hosts: jboss_servers
+  gather_facts: false
+  tasks:
+    - name: Backup existing WAR file
+      shell: mv /path/on/jboss_server/application.war /path/on/jboss_server/application_$(date +"%Y%m%d").war
+      args:
+        warn: false
+      register: backup_result
+      changed_when: backup_result.stdout != ""
+
+    - name: Copy new WAR file from Nexus
+      shell: wget -O /path/on/jboss_server/application.war https://nexus.example.com/repository/my-repo/application.war
+      args:
+        warn: false
+      changed_when: false
+
+    - name: Copy configuration files to UAT and PROD
+      copy:
+        src: path/to/your/config-files
+        dest: /path/on/jboss_server/
+        owner: jboss
+        group: jboss
+        mode: '0644'
+
+    - name: Restart JBoss server
+      systemd:
+        name: jboss.service  # Replace with the name of your JBoss service unit
+        state: restarted    
+
+
+
+
+
+# In this updated version, the playbook adds tasks to backup the existing WAR file, copy configuration files to UAT and PROD, pull artifacts libraries from Nexus, and deploy the new WAR file to the JBoss server.
+
+# Please make sure to customize the paths, names, Nexus URL, and other parameters in the playbook according to your specific setup.
+
+# The backup task uses the shell module to rename the existing WAR file with the current date appended to its name. Adjust the source and destination paths accordingly.
+
+# The task to copy the new WAR file from Nexus uses the shell module to download the file from the Nexus repository and save it to the appropriate location on the JBoss server. Update the Nexus URL and destination path to match your environment.
+
+# The task to copy the configuration files uses the copy module to transfer the required properties files to the JBoss server. Adjust the source and destination paths to match your configuration.
+
+# Lastly, the playbook includes the task to restart the JBoss server using the systemd module. Update the name parameter to match your JBoss service unit name.
+
+# With this configuration, when you trigger the GitLab pipeline, it will run the Ansible playbook, including the additional tasks for backup, configuration file copy, Nexus artifact retrieval, and deployment of the new WAR file to the JBoss server.
+
+ 
