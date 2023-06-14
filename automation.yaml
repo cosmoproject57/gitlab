@@ -65,4 +65,57 @@ deploy:
 # With this configuration, when you trigger the GitLab pipeline, it will run the Ansible playbook, including the additional tasks for backup, 
 # configuration file copy, Nexus artifact retrieval, and deployment of the new WAR file to the JBoss server.
 
+
+#==
+
+- name: Check JBoss server status before stopping
+  hosts: jboss_servers
+  gather_facts: false
+  tasks:
+    - name: Check JBoss server status
+      wait_for:
+        host: localhost
+        port: 8080  # Adjust the port number if necessary
+        state: started
+        timeout: 300  # Adjust the timeout value if necessary
+
+- name: Stop JBoss server
+  hosts: jboss_servers
+  gather_facts: false
+  tasks:
+    - name: Execute stop script in JBoss server
+      command: sh /path/on/jboss_server/stop_script.sh
+      args:
+        warn: false
+
+- name: Deploy JAR/WAR to JBoss server
+  hosts: jboss_servers
+  gather_facts: false
+  tasks:
+    - name: Backup existing WAR file
+      shell: mv /path/on/jboss_server/application.war /path/on/jboss_server/application_$(date +"%Y%m%d").war
+      args:
+        warn: false
+      register: backup_result
+      changed_when: backup_result.stdout != ""
+
+    - name: Copy new WAR file from Nexus
+      shell: wget -O /path/on/jboss_server/application.war https://nexus.example.com/repository/my-repo/application.war
+      args:
+        warn: false
+      changed_when: false
+
+    - name: Copy configuration files to UAT and PROD
+      copy:
+        src: path/to/your/config-files
+        dest: /path/on/jboss_server/
+        owner: jboss
+        group: jboss
+        mode: '0644'
+
+    - name: Restart JBoss server
+      systemd:
+        name: jboss.service  # Replace with the name of your JBoss service unit
+        state: restarted
+
  
