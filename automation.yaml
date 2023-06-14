@@ -118,4 +118,14 @@ deploy:
         name: jboss.service  # Replace with the name of your JBoss service unit
         state: restarted
 
- 
+# In this updated version, the playbook includes an additional play to check the status of the JBoss server before performing the stop script. 
+# The playbook first checks the JBoss server status using the wait_for module and then executes the stop script on the JBoss server using the command module. 
+# Adjust the port value in the wait_for module and the command module parameters to match your environment.
+
+# The rest of the playbook remains the same as before, including tasks for backing up the existing WAR file, 
+# copying configuration files, pulling artifacts from Nexus, and deploying the new WAR file to the JBoss server.
+
+# Please make sure to customize the paths, names, Nexus URL, and other parameters in the playbook according to your specific setup.
+
+# With this configuration, when you trigger the GitLab pipeline, it will run the Ansible playbook, including the tasks to check the JBoss server status, 
+# stop the server, perform the backup, configuration file copy, Nexus artifact retrieval, and deployment of the new WAR file to the JBoss server.
